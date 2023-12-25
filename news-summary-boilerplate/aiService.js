@@ -1,17 +1,19 @@
 import dotenv from "dotenv";
 import SnetSDK, { DefaultPaymentStrategy } from "snet-sdk";
 import * as messages from "./grpc_stubs/summary_pb.cjs";
-import { TextSummaryClient } from "./grpc_stubs/summary_grpc_pb.cjs"; 
-import config from "./config.js";
+import { TextSummaryClient } from "./grpc_stubs/summary_grpc_pb.cjs";
+import config from "./config.cjs";
 
 dotenv.config();
-const sdk = new SnetSDK(config);
+const sdk = new SnetSDK.default(config);
 
 const orgId = "snet";
 const serviceId = "news-summary";
 const groupName = "default_group";
 const paymentStrategy = new DefaultPaymentStrategy(100);
-let tokenToMakeFreeCall = process.env.FREE_CALL_TOKEN ? process.env.FREE_CALL_TOKEN.toUpperCase() : "";
+let tokenToMakeFreeCall = process.env.FREE_CALL_TOKEN
+  ? process.env.FREE_CALL_TOKEN.toUpperCase()
+  : "";
 tokenToMakeFreeCall = Boolean(tokenToMakeFreeCall)
   ? tokenToMakeFreeCall.startsWith("0X")
     ? tokenToMakeFreeCall
@@ -26,7 +28,8 @@ const serviceClientOptions = {
 };
 
 const closeConnection = () => {
-  sdk.web3.currentProvider.connection && sdk.web3.currentProvider.connection.close();
+  sdk.web3.currentProvider.connection &&
+    sdk.web3.currentProvider.connection.close();
 };
 
 export const getServiceClient = async () => {
@@ -39,6 +42,7 @@ export const getServiceClient = async () => {
       paymentStrategy,
       serviceClientOptions
     );
+    console.log("DEBUG aiService.js service Client: " + serviceClient);
     return serviceClient;
   } catch (error) {
     console.error("Error creating service client:", error);
@@ -51,15 +55,18 @@ const summarizeText = async (serviceClientWithToken, text) => {
     if (!serviceClient) {
       serviceClient = await getServiceClient();
     }
-
+    console.log("DEBUG aiService.js serviceClient var: " + serviceClient);
+    console.log("DEBUG aiService.js messages.proto var: " + messages.proto);
     const request = new messages.proto.Request(); // Adjusted for named import
-    request.setText(text); // Assuming setText is the correct method for setting text
+    request.setArticleContent(text); // Assuming setText is the correct method for setting text
 
     return new Promise((resolve, reject) => {
-      serviceClient.service.summarize(request, (err, result) => { // Update method name
+      serviceClient.service.summarize(request, (err, result) => {
+        // Update method name
         if (err) {
           return reject(err);
         }
+        console.log("DEBUG aiService.js result: " + result);
         resolve(result.getSummary()); // Assuming getSummary is the correct method to get summary
       });
     });
