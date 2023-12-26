@@ -2,7 +2,7 @@ import dotenv from "dotenv";
 import SnetSDK, { DefaultPaymentStrategy } from "snet-sdk";
 import * as messages from "./grpc_stubs/summary_pb.cjs";
 import { TextSummaryClient } from "./grpc_stubs/summary_grpc_pb.cjs";
-import config from "./config.cjs";
+import config from "./config.js";
 
 dotenv.config();
 const sdk = new SnetSDK.default(config);

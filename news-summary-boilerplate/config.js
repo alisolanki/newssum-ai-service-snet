@@ -1,7 +1,8 @@
 /**
  * dotenv must be on the top of the entry file of the project
  */
- require("dotenv").config();
+import "dotenv/config";
+
  export default {
    web3Provider: process.env.PROVIDER_HOST,
    privateKey: process.env.PRIVATE_KEY,
